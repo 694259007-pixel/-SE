@@ -1,0 +1,1736 @@
+<!DOCTYPE html>
+<html lang="th" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบจองห้องดูหนังออนไลน์ - CINEBOOK VIP</title>
+  
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <!-- Google Fonts: Prompt -->
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- SweetAlert2 CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  
+  <!-- JS Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(135deg, #090714 0%, #150d2a 50%, #0d0618 100%);
+      --neon-pink: #ff007f;
+      --neon-pink-glow: rgba(255, 0, 127, 0.4);
+      --neon-purple: #8a2be2;
+      --neon-purple-glow: rgba(138, 43, 226, 0.4);
+      --neon-cyan: #00f0ff;
+      --neon-cyan-glow: rgba(0, 240, 255, 0.35);
+      --glass-bg: rgba(22, 17, 38, 0.75);
+      --glass-border: rgba(255, 255, 255, 0.12);
+    }
+
+    body {
+      font-family: 'Prompt', sans-serif;
+      background: var(--bg-gradient);
+      background-attachment: fixed;
+      color: #e2e8f0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .glass-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      transition: all 0.3s ease;
+    }
+
+    .glass-card:hover {
+      border-color: rgba(255, 0, 127, 0.3);
+      box-shadow: 0 10px 35px 0 var(--neon-pink-glow);
+    }
+
+    .text-neon-pink { color: var(--neon-pink) !important; text-shadow: 0 0 10px var(--neon-pink-glow); }
+    .text-neon-cyan { color: var(--neon-cyan) !important; text-shadow: 0 0 10px var(--neon-cyan-glow); }
+    .text-neon-purple { color: var(--neon-purple) !important; text-shadow: 0 0 10px var(--neon-purple-glow); }
+
+    .btn-neon-pink {
+      background: linear-gradient(45deg, #ff007f, #d0006f);
+      color: #ffffff;
+      border: none;
+      font-weight: 600;
+      box-shadow: 0 4px 15px var(--neon-pink-glow);
+      transition: all 0.3s ease;
+    }
+
+    .btn-neon-pink:hover {
+      background: linear-gradient(45deg, #d0006f, #ff007f);
+      color: #ffffff;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 0, 127, 0.6);
+    }
+
+    .btn-neon-purple {
+      background: linear-gradient(45deg, #8a2be2, #6a0dad);
+      color: #ffffff;
+      border: none;
+      font-weight: 600;
+      box-shadow: 0 4px 15px var(--neon-purple-glow);
+      transition: all 0.3s ease;
+    }
+
+    .btn-neon-purple:hover {
+      background: linear-gradient(45deg, #6a0dad, #8a2be2);
+      color: #ffffff;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(138, 43, 226, 0.6);
+    }
+
+    .btn-neon-outline {
+      background: transparent;
+      border: 1px solid var(--neon-pink);
+      color: var(--neon-pink);
+      transition: all 0.3s ease;
+    }
+
+    .btn-neon-outline:hover {
+      background: var(--neon-pink);
+      color: #ffffff;
+      box-shadow: 0 0 15px var(--neon-pink-glow);
+    }
+
+    .navbar-cinema {
+      background: rgba(12, 9, 24, 0.9) !important;
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .form-control, .form-select {
+      background: rgba(15, 11, 28, 0.9) !important;
+      border: 1px solid var(--glass-border) !important;
+      color: #ffffff !important;
+      border-radius: 10px;
+    }
+
+    .form-control:focus, .form-select:focus {
+      border-color: var(--neon-pink) !important;
+      box-shadow: 0 0 10px var(--neon-pink-glow) !important;
+    }
+
+    option {
+      background-color: #150d2a !important;
+      color: #ffffff !important;
+    }
+
+    .table-cinema {
+      color: #e2e8f0;
+      border-color: var(--glass-border);
+    }
+
+    .table-cinema th {
+      background: rgba(30, 22, 53, 0.8);
+      color: var(--neon-cyan);
+      border-bottom: 2px solid var(--glass-border);
+    }
+
+    .table-cinema td {
+      background: rgba(18, 14, 33, 0.5);
+      vertical-align: middle;
+    }
+
+    .movie-poster-box {
+      width: 140px;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 12px;
+      border: 2px solid var(--neon-cyan-glow);
+      box-shadow: 0 4px 15px rgba(0, 240, 255, 0.2);
+    }
+
+    .badge-confirmed { background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid #10b981; }
+    .badge-pending { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid #f59e0b; }
+    .badge-canceled { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444; }
+    .badge-checkedin { background: rgba(59, 130, 246, 0.2); color: #3b82f6; border: 1px solid #3b82f6; }
+
+    .sidebar-nav .nav-link {
+      color: #a0aec0;
+      border-radius: 10px;
+      padding: 10px 16px;
+      margin-bottom: 8px;
+      transition: all 0.3s;
+    }
+
+    .sidebar-nav .nav-link:hover, .sidebar-nav .nav-link.active {
+      background: linear-gradient(90deg, rgba(255,0,127,0.2) 0%, rgba(138,43,226,0.2) 100%);
+      color: #ffffff;
+      border-left: 4px solid var(--neon-pink);
+    }
+
+    .swal2-popup {
+      background: #140f26 !important;
+      border: 1px solid var(--glass-border) !important;
+      color: #ffffff !important;
+      border-radius: 16px !important;
+    }
+
+    .modal-content {
+      background: #140f26;
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      color: #ffffff;
+    }
+
+    .modal-header, .modal-footer {
+      border-color: var(--glass-border);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark navbar-cinema sticky-top">
+    <div class="container-fluid px-4">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="#" onclick="showSection('default')">
+        <i class="fa-solid fa-film text-neon-pink fs-3"></i>
+        <span>CINE<span class="text-neon-pink">BOOK</span> <span class="badge bg-purple text-neon-cyan fs-6">VIP</span></span>
+      </a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarMain">
+        <div class="ms-auto d-flex align-items-center gap-3" id="userInfoSection">
+          <div id="loggedUserDisplay" class="d-none text-end">
+            <span class="d-block fw-semibold" id="navUserFullname">Guest</span>
+            <small class="badge bg-secondary" id="navUserRole">User</small>
+          </div>
+          <button id="authActionButton" class="btn btn-neon-pink rounded-pill px-4" onclick="handleAuthAction()">
+            <i class="fa-solid fa-right-to-bracket me-2"></i>เข้าสู่ระบบ
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container-fluid px-4 py-4 flex-grow-1">
+    
+    <!-- 1. LOGIN SECTION -->
+    <div id="loginSection" class="row justify-content-center py-5">
+      <div class="col-md-5 col-lg-4">
+        <div class="card glass-card p-4 p-md-5">
+          <div class="text-center mb-4">
+            <i class="fa-solid fa-clapperboard text-neon-pink display-4 mb-2"></i>
+            <h3 class="fw-bold">เข้าสู่ระบบจองห้อง</h3>
+            <p class="text-muted small">กรุณาระบุ Username และ Password เพื่อเข้าใช้งาน</p>
+          </div>
+          <form id="loginForm" onsubmit="submitLogin(event)">
+            <div class="mb-3">
+              <label class="form-label text-neon-cyan"><i class="fa-solid fa-user me-2"></i>Username</label>
+              <input type="text" id="loginUsername" class="form-control" placeholder="กรอกชื่อผู้ใช้" required>
+            </div>
+            <div class="mb-4">
+              <label class="form-label text-neon-cyan"><i class="fa-solid fa-lock me-2"></i>Password</label>
+              <input type="password" id="loginPassword" class="form-control" placeholder="กรอกรหัสผ่าน" required>
+            </div>
+            <button type="submit" class="btn btn-neon-pink w-100 py-2 mb-3 rounded-3">
+              <i class="fa-solid fa-arrow-right-to-bracket me-2"></i>เข้าสู่ระบบ
+            </button>
+            <div class="text-center">
+              <span class="text-muted small">ยังไม่มีบัญชีสมาชิก? </span>
+              <a href="#" class="text-neon-pink fw-semibold text-decoration-none" onclick="switchAuthMode('register')">สมัครสมาชิกที่นี่</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. REGISTER SECTION -->
+    <div id="registerSection" class="row justify-content-center py-5 d-none">
+      <div class="col-md-6 col-lg-5">
+        <div class="card glass-card p-4 p-md-5">
+          <div class="text-center mb-4">
+            <i class="fa-solid fa-user-plus text-neon-cyan display-4 mb-2"></i>
+            <h3 class="fw-bold">สมัครสมาชิกใหม่</h3>
+            <p class="text-muted small">กรอกข้อมูลเพื่อสร้างบัญชีสำหรับจองห้องภาพยนตร์</p>
+          </div>
+          <form id="registerForm" onsubmit="submitRegister(event)">
+            <div class="mb-3">
+              <label class="form-label"><i class="fa-solid fa-id-card me-2 text-neon-pink"></i>ชื่อ-นามสกุล</label>
+              <input type="text" id="regFullname" class="form-control" placeholder="นาย สมชาย ใจดี" required>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label"><i class="fa-solid fa-user me-2 text-neon-pink"></i>Username</label>
+                <input type="text" id="regUsername" class="form-control" placeholder="username" required>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label"><i class="fa-solid fa-phone me-2 text-neon-pink"></i>เบอร์โทรศัพท์</label>
+                <input type="tel" id="regTelephone" class="form-control" placeholder="0812345678" required>
+              </div>
+            </div>
+            <div class="mb-4">
+              <label class="form-label"><i class="fa-solid fa-key me-2 text-neon-pink"></i>Password</label>
+              <input type="password" id="regPassword" class="form-control" placeholder="ความยาวอย่างน้อย 6 ตัวอักษร" required minlength="6">
+            </div>
+            <button type="submit" class="btn btn-neon-purple w-100 py-2 mb-3 rounded-3">
+              <i class="fa-solid fa-check-circle me-2"></i>ยืนยันการสมัครสมาชิก
+            </button>
+            <div class="text-center">
+              <span class="text-muted small">มีบัญชีอยู่แล้ว? </span>
+              <a href="#" class="text-neon-cyan fw-semibold text-decoration-none" onclick="switchAuthMode('login')">เข้าสู่ระบบ</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. USER WORKSPACE -->
+    <div id="userWorkspace" class="d-none">
+      <ul class="nav nav-pills mb-4 gap-2 border-bottom border-secondary pb-3" id="userTabs">
+        <li class="nav-item">
+          <button class="nav-link active btn-neon-purple text-white px-4 me-2" id="tabBtnBook" onclick="showUserTab('bookRoom')">
+            <i class="fa-solid fa-ticket me-2"></i>จองห้องดูหนัง
+          </button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link btn-outline-light px-4 me-2" id="tabBtnCheck" onclick="showUserTab('checkRooms')">
+            <i class="fa-solid fa-door-open me-2"></i>ตรวจสอบห้องว่าง
+          </button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link btn-outline-light px-4" id="tabBtnHistory" onclick="showUserTab('myBookings')">
+            <i class="fa-solid fa-clock-rotate-left me-2"></i>ประวัติการจองของฉัน
+          </button>
+        </li>
+      </ul>
+
+      <!-- User Tab 1: Book Room -->
+      <div id="userTabBookRoom">
+        <div class="row justify-content-center">
+          <div class="col-lg-8 col-xl-7">
+            <div class="card glass-card p-4 p-md-5">
+              <div class="text-center mb-4">
+                <h4 class="fw-bold text-white"><i class="fa-solid fa-ticket text-neon-pink me-2"></i>แบบฟอร์มจองห้องภาพยนตร์ VIP</h4>
+              </div>
+
+              <form id="bookingForm" onsubmit="submitBooking(event)">
+                <div class="mb-3">
+                  <label class="form-label text-neon-cyan fw-semibold">เลือกภาพยนตร์ที่ต้องการรับชม</label>
+                  <select id="bookMovieSelect" class="form-select" required onchange="updateMoviePreviewCard()">
+                  </select>
+                </div>
+
+                <div class="card glass-card p-3 mb-4" style="background: rgba(12, 8, 26, 0.85);" id="moviePreviewCard">
+                </div>
+
+                <div class="row g-3 mb-3">
+                  <div class="col-md-6">
+                    <label class="form-label text-neon-cyan fw-semibold">เลือกห้องภาพยนตร์</label>
+                    <select id="bookRoomSelect" class="form-select" required onchange="updateBookingRoomInfo()">
+                      <option value="">-- เลือกห้องพัก --</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label text-neon-cyan fw-semibold">วันที่เข้าใช้บริการ</label>
+                    <input type="date" id="bookDate" class="form-control" required>
+                  </div>
+                </div>
+
+                <div class="mb-4">
+                  <label class="form-label text-neon-cyan fw-semibold">รอบเวลาเข้าชม</label>
+                  <select id="bookTime" class="form-select" required>
+                    <option value="">-- เลือกรอบเวลา --</option>
+                    <option value="10:00 - 12:30">10:00 - 12:30 น. (รอบเช้า)</option>
+                    <option value="13:00 - 15:30">13:00 - 15:30 น. (รอบบ่าย)</option>
+                    <option value="16:00 - 18:30">16:00 - 18:30 น. (รอบเย็น)</option>
+                    <option value="19:00 - 21:30">19:00 - 21:30 น. (รอบค่ำ)</option>
+                    <option value="22:00 - 00:30">22:00 - 00:30 น. (รอบดึก)</option>
+                  </select>
+                </div>
+
+                <div id="roomPreviewDetail" class="p-3 mb-4 rounded-3 d-none" style="background: rgba(0,240,255,0.08); border: 1px border-secondary;">
+                </div>
+
+                <button type="submit" class="btn btn-neon-pink w-100 py-3 rounded-3 fs-5">
+                  <i class="fa-solid fa-calendar-check me-2"></i>ยืนยันการจองห้อง
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- User Tab 2: Check Rooms -->
+      <div id="userTabCheckRooms" class="d-none">
+        <h4 class="fw-bold mb-4 text-neon-cyan"><i class="fa-solid fa-cubes me-2"></i>รายการห้องภาพยนตร์ทั้งหมด</h4>
+        <div class="row g-4" id="roomsGridContainer">
+        </div>
+      </div>
+
+      <!-- User Tab 3: History -->
+      <div id="userTabMyBookings" class="d-none">
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+          <h4 class="fw-bold text-neon-pink mb-0"><i class="fa-solid fa-clock-rotate-left me-2"></i>ประวัติการจองของฉัน</h4>
+          <div class="d-flex gap-2">
+            <button class="btn btn-outline-success rounded-pill" onclick="exportUserBookingsExcel()">
+              <i class="fa-solid fa-file-excel me-2"></i>ส่งออก Excel
+            </button>
+            <button class="btn btn-outline-danger rounded-pill" onclick="exportUserBookingsPDF()">
+              <i class="fa-solid fa-file-pdf me-2"></i>ดาวน์โหลด PDF
+            </button>
+          </div>
+        </div>
+
+        <div class="card glass-card p-3">
+          <div class="table-responsive" id="myBookingsPrintArea">
+            <table class="table table-cinema align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>รหัสการจอง</th>
+                  <th>ภาพยนตร์</th>
+                  <th>ห้องดูหนัง</th>
+                  <th>วันที่</th>
+                  <th>รอบเวลา</th>
+                  <th>สถานะ</th>
+                  <th>วันที่ทำรายการ</th>
+                  <th class="text-center">จัดการ</th>
+                </tr>
+              </thead>
+              <tbody id="myBookingsTableBody">
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 4. ADMIN WORKSPACE -->
+    <div id="adminWorkspace" class="d-none">
+      <div class="row g-4">
+        
+        <!-- Sidebar Navigation -->
+        <div class="col-lg-3 col-xl-2">
+          <div class="card glass-card p-3 mb-4">
+            <div class="text-center py-3 border-bottom border-secondary mb-3">
+              <i class="fa-solid fa-user-shield text-neon-pink display-5 mb-2"></i>
+              <h6 class="fw-bold mb-0 text-neon-cyan">Admin Console</h6>
+              <small class="text-muted">ผู้ดูแลระบบ</small>
+            </div>
+            <nav class="sidebar-nav nav flex-column" id="adminSidebarMenu">
+              <a class="nav-link active" href="#" onclick="showAdminTab('dashboard')">
+                <i class="fa-solid fa-chart-pie me-2"></i>ภาพรวมระบบ (Dashboard)
+              </a>
+              <a class="nav-link" href="#" onclick="showAdminTab('roomManagement')">
+                <i class="fa-solid fa-door-open me-2"></i>จัดการห้องพัก (Rooms)
+              </a>
+              <a class="nav-link" href="#" onclick="showAdminTab('userManagement')">
+                <i class="fa-solid fa-users-gear me-2"></i>จัดการผู้ใช้งาน (Users)
+              </a>
+            </nav>
+          </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="col-lg-9 col-xl-10">
+          
+          <!-- Admin Dashboard View -->
+          <div id="adminTabDashboard">
+            
+            <div class="row g-3 mb-4">
+              <div class="col-sm-6 col-md-3">
+                <div class="card glass-card p-3 border-start border-4 border-info">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <small class="text-muted d-block">การจองทั้งหมด</small>
+                      <h3 class="fw-bold mb-0 text-neon-cyan" id="statTotalBookings">0</h3>
+                    </div>
+                    <i class="fa-solid fa-calendar-days fs-1 text-neon-cyan opacity-50"></i>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-sm-6 col-md-3">
+                <div class="card glass-card p-3 border-start border-4 border-success">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <small class="text-muted d-block">สำเร็จ (Confirmed)</small>
+                      <h3 class="fw-bold mb-0 text-success" id="statConfirmedBookings">0</h3>
+                    </div>
+                    <i class="fa-solid fa-circle-check fs-1 text-success opacity-50"></i>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-sm-6 col-md-3">
+                <div class="card glass-card p-3 border-start border-4 border-danger">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <small class="text-muted d-block">ยกเลิก (Canceled)</small>
+                      <h3 class="fw-bold mb-0 text-danger" id="statCanceledBookings">0</h3>
+                    </div>
+                    <i class="fa-solid fa-ban fs-1 text-danger opacity-50"></i>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-sm-6 col-md-3">
+                <div class="card glass-card p-3 border-start border-4 border-warning">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <small class="text-muted d-block">ห้องภาพยนตร์</small>
+                      <h3 class="fw-bold mb-0 text-warning" id="statTotalRooms">0</h3>
+                    </div>
+                    <i class="fa-solid fa-door-closed fs-1 text-warning opacity-50"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- All Bookings Table -->
+            <div class="card glass-card p-4">
+              <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                <h5 class="fw-bold mb-0 text-neon-pink"><i class="fa-solid fa-list-check me-2"></i>รายการผู้จองห้องทั้งหมด</h5>
+                <div class="d-flex gap-2">
+                  <button class="btn btn-sm btn-outline-success rounded-pill" onclick="exportAdminBookingsExcel()">
+                    <i class="fa-solid fa-file-excel me-1"></i>Excel Report
+                  </button>
+                  <button class="btn btn-sm btn-outline-danger rounded-pill" onclick="exportAdminBookingsPDF()">
+                    <i class="fa-solid fa-file-pdf me-1"></i>PDF Report
+                  </button>
+                </div>
+              </div>
+
+              <div class="table-responsive" id="adminBookingsPrintArea">
+                <table class="table table-cinema align-middle mb-0">
+                  <thead>
+                    <tr>
+                      <th>Booking ID</th>
+                      <th>ผู้จอง (Username)</th>
+                      <th>ชื่อ-นามสกุล</th>
+                      <th>ภาพยนตร์</th>
+                      <th>ห้องดูหนัง</th>
+                      <th>วันที่</th>
+                      <th>รอบเวลา</th>
+                      <th>สถานะ</th>
+                      <th class="text-center">การจัดการ</th>
+                    </tr>
+                  </thead>
+                  <tbody id="adminBookingsTableBody">
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Admin Room Management View -->
+          <div id="adminTabRoomManagement" class="d-none">
+            <div class="card glass-card p-4">
+              <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="fw-bold mb-0 text-neon-cyan"><i class="fa-solid fa-door-open me-2"></i>จัดการข้อมูลห้องภาพยนตร์</h5>
+                <button class="btn btn-sm btn-neon-pink rounded-pill px-3" onclick="openAddRoomModal()">
+                  <i class="fa-solid fa-plus me-1"></i>เพิ่มห้องใหม่
+                </button>
+              </div>
+
+              <div class="table-responsive">
+                <table class="table table-cinema align-middle mb-0">
+                  <thead>
+                    <tr>
+                      <th>เลขห้อง</th>
+                      <th>ชื่อห้อง / ชนิดห้อง</th>
+                      <th>ความจุ (ที่นั่ง)</th>
+                      <th>สถานะห้อง</th>
+                      <th class="text-center">การจัดการ</th>
+                    </tr>
+                  </thead>
+                  <tbody id="adminRoomsTableBody">
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Admin User Management View -->
+          <div id="adminTabUserManagement" class="d-none">
+            <div class="card glass-card p-4">
+              <h5 class="fw-bold mb-4 text-neon-cyan"><i class="fa-solid fa-users-gear me-2"></i>จัดการรายชื่อสมาชิกในระบบ</h5>
+              <div class="table-responsive">
+                <table class="table table-cinema align-middle mb-0">
+                  <thead>
+                    <tr>
+                      <th>User ID</th>
+                      <th>ชื่อ-นามสกุล</th>
+                      <th>Username</th>
+                      <th>เบอร์โทรศัพท์</th>
+                      <th>สิทธิ์ (Role)</th>
+                      <th>สถานะ (Status)</th>
+                      <th class="text-center">การจัดการ</th>
+                    </tr>
+                  </thead>
+                  <tbody id="adminUsersTableBody">
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <footer class="mt-auto py-3 text-center border-top border-secondary" style="background: rgba(10, 7, 20, 0.95);">
+    <div class="container">
+      <p class="mb-0 text-muted small">© 2026 CINEBOOK VIP Cinema Room Booking System. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- MODALS FOR EDITING AND CREATING -->
+
+  <!-- Modal 1: Edit Booking Modal -->
+  <div class="modal fade" id="editBookingModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-header-title text-neon-pink fw-bold"><i class="fa-solid fa-pen-to-square me-2"></i>แก้ไขรายละเอียดการจอง</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editBookingForm" onsubmit="saveEditBooking(event)">
+            <input type="hidden" id="editBookingId">
+            <div class="mb-3">
+              <label class="form-label text-neon-cyan">ภาพยนตร์</label>
+              <select id="editBookingMovie" class="form-select" required></select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label text-neon-cyan">ห้องดูหนัง</label>
+              <select id="editBookingRoom" class="form-select" required></select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label text-neon-cyan">วันที่ใช้งาน</label>
+              <input type="date" id="editBookingDate" class="form-control" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label text-neon-cyan">รอบเวลา</label>
+              <select id="editBookingTime" class="form-select" required>
+                <option value="10:00 - 12:30">10:00 - 12:30 น.</option>
+                <option value="13:00 - 15:30">13:00 - 15:30 น.</option>
+                <option value="16:00 - 18:30">16:00 - 18:30 น.</option>
+                <option value="19:00 - 21:30">19:00 - 21:30 น.</option>
+                <option value="22:00 - 00:30">22:00 - 00:30 น.</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label text-neon-cyan">สถานะ</label>
+              <select id="editBookingStatus" class="form-select" required>
+                <option value="Confirmed">Confirmed</option>
+                <option value="Checked-in">Checked-in</option>
+                <option value="Canceled">Canceled</option>
+              </select>
+            </div>
+            <div class="text-end mt-4">
+              <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">ยกเลิก</button>
+              <button type="submit" class="btn btn-neon-pink px-4">บันทึกการแก้ไข</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 2: Add/Edit Room Modal -->
+  <div class="modal fade" id="roomModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title text-neon-cyan fw-bold" id="roomModalTitle"><i class="fa-solid fa-door-open me-2"></i>จัดการห้องพัก</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="roomForm" onsubmit="saveRoomForm(event)">
+            <input type="hidden" id="roomIsEdit" value="false">
+            <div class="mb-3">
+              <label class="form-label text-neon-pink">หมายเลขห้อง (Room Number)</label>
+              <input type="text" id="roomModalNumber" class="form-control" placeholder="เช่น 106" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label text-neon-pink">ชื่อห้อง / ประเภทห้อง</label>
+              <input type="text" id="roomModalName" class="form-control" placeholder="เช่น VIP Atmos Suite" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label text-neon-pink">ความจุที่นั่ง (ท่าน)</label>
+              <input type="number" id="roomModalCapacity" class="form-control" min="1" max="50" placeholder="เช่น 6" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label text-neon-pink">สถานะห้อง</label>
+              <select id="roomModalStatus" class="form-select" required>
+                <option value="Available">พร้อมใช้งาน (Available)</option>
+                <option value="Maintenance">ปิดปรับปรุง (Maintenance)</option>
+              </select>
+            </div>
+            <div class="text-end mt-4">
+              <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">ยกเลิก</button>
+              <button type="submit" class="btn btn-neon-purple px-4">บันทึกห้องพัก</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 3: Edit User Modal -->
+  <div class="modal fade" id="editUserModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title text-neon-purple fw-bold"><i class="fa-solid fa-user-pen me-2"></i>แก้ไขข้อมูลสมาชิก</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editUserForm" onsubmit="saveUserForm(event)">
+            <input type="hidden" id="editUserId">
+            <div class="mb-3">
+              <label class="form-label text-neon-cyan">ชื่อ-นามสกุล</label>
+              <input type="text" id="editUserFullname" class="form-control" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label text-neon-cyan">Username (อ่านอย่างเดียว)</label>
+              <input type="text" id="editUserUsername" class="form-control" readonly style="opacity: 0.7;">
+            </div>
+            <div class="mb-3">
+              <label class="form-label text-neon-cyan">เบอร์โทรศัพท์</label>
+              <input type="tel" id="editUserTelephone" class="form-control" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label text-neon-cyan">รหัสผ่านใหม่ (เว้นว่างหากไม่เปลี่ยน)</label>
+              <input type="password" id="editUserPassword" class="form-control" placeholder="กรอกรหัสผ่านใหม่">
+            </div>
+            <div class="row mb-3">
+              <div class="col-6">
+                <label class="form-label text-neon-cyan">สิทธิ์ใช้งาน</label>
+                <select id="editUserRole" class="form-select" required>
+                  <option value="User">User</option>
+                  <option value="Admin">Admin</option>
+                </select>
+              </div>
+              <div class="col-6">
+                <label class="form-label text-neon-cyan">สถานะ</label>
+                <select id="editUserStatus" class="form-select" required>
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
+                </select>
+              </div>
+            </div>
+            <div class="text-end mt-4">
+              <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">ยกเลิก</button>
+              <button type="submit" class="btn btn-neon-purple px-4">บันทึกการแก้ไข</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Global Application State
+    let currentUser = null;
+    let roomsData = [];
+    let bookingsData = [];
+    let usersData = [];
+
+    const moviesData = [
+      { id: 'm1', title: 'Godzilla x Kong: The New Empire', genre: 'Action / Sci-Fi', duration: '115 นาที', image: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=600&q=80' },
+      { id: 'm2', title: 'Dune: Part Two', genre: 'Sci-Fi / Adventure', duration: '166 นาที', image: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=600&q=80' },
+      { id: 'm3', title: 'Inside Out 2', genre: 'Animation / Family', duration: '96 นาที', image: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=600&q=80' },
+      { id: 'm4', title: 'Deadpool & Wolverine', genre: 'Action / Comedy', duration: '128 นาที', image: 'https://images.unsplash.com/photo-1518676590629-3dcbd9c5a5c9?auto=format&fit=crop&w=600&q=80' }
+    ];
+
+    const defaultRooms = [
+      { room_number: '101', room_name: 'VIP Laser Cinema Suite', total_capacity: 4, available_status: 'Available' },
+      { room_number: '102', room_name: 'Premium Couple Recliner', total_capacity: 2, available_status: 'Available' },
+      { room_number: '103', room_name: 'IMAX Mini Private Lounge', total_capacity: 8, available_status: 'Available' },
+      { room_number: '104', room_name: 'Family Ultimate 4K Room', total_capacity: 10, available_status: 'Available' },
+      { room_number: '105', room_name: 'Standard VIP Screen', total_capacity: 6, available_status: 'Available' }
+    ];
+
+    const STORAGE_KEY_USERS = 'cinebook_users_db';
+    const STORAGE_KEY_BOOKINGS = 'cinebook_bookings_db';
+    const STORAGE_KEY_ROOMS = 'cinebook_rooms_db';
+
+    window.onload = function() {
+      const today = new Date().toISOString().split('T')[0];
+      const dateInput = document.getElementById('bookDate');
+      if (dateInput) dateInput.value = today;
+
+      renderMovieOptions();
+      updateMoviePreviewCard();
+      loadRoomsData();
+    };
+
+    function runGAS(funcName, ...args) {
+      return new Promise((resolve, reject) => {
+        if (typeof google !== 'undefined' && google.script && google.script.run) {
+          google.script.run
+            .withSuccessHandler(resolve)
+            .withFailureHandler((err) => {
+              console.warn(`GAS Error for ${funcName}:`, err);
+              resolve(mockGASBackend(funcName, ...args));
+            })[funcName](...args);
+        } else {
+          setTimeout(() => {
+            try { resolve(mockGASBackend(funcName, ...args)); } catch (err) { reject(err); }
+          }, 200);
+        }
+      });
+    }
+
+    function mockGASBackend(funcName, ...args) {
+      let mockUsers = JSON.parse(localStorage.getItem(STORAGE_KEY_USERS)) || [
+        { id: 'USR-001', fullname: 'ผู้ดูแลระบบสูงสุด', username: 'admin', password: 'admin123', telephone: '0812345678', role: 'Admin', status: 'Active' },
+        { id: 'USR-002', fullname: 'สมชาย ใจดี', username: 'user1', password: '123456', telephone: '0898765432', role: 'User', status: 'Active' }
+      ];
+
+      let mockBookings = JSON.parse(localStorage.getItem(STORAGE_KEY_BOOKINGS)) || [
+        { booking_id: 'BK-1001', username: 'user1', fullname: 'สมชาย ใจดี', movie_title: 'Godzilla x Kong: The New Empire', room_number: '101', date: new Date().toISOString().split('T')[0], time: '16:00 - 18:30', status: 'Confirmed', created_at: new Date().toLocaleString('th-TH') }
+      ];
+
+      let mockRooms = JSON.parse(localStorage.getItem(STORAGE_KEY_ROOMS)) || defaultRooms;
+
+      if (funcName === 'checkLogin') {
+        const [uName, uPass] = args;
+        const found = mockUsers.find(u => u.username === uName && u.password === uPass);
+        if (!found) return { success: false, message: 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง' };
+        if (found.status !== 'Active') return { success: false, message: 'บัญชีถูกระงับการใช้งาน' };
+        return { success: true, user: found };
+      }
+
+      if (funcName === 'registerUser') {
+        const [userData] = args;
+        if (mockUsers.some(u => u.username.toLowerCase() === userData.username.toLowerCase())) {
+          return { success: false, message: 'Username นี้ถูกใช้งานไปแล้ว' };
+        }
+        const newUser = { id: 'USR-' + Math.floor(1000 + Math.random() * 9000), fullname: userData.fullname, username: userData.username, password: userData.password, telephone: userData.telephone, role: 'User', status: 'Active' };
+        mockUsers.push(newUser);
+        localStorage.setItem(STORAGE_KEY_USERS, JSON.stringify(mockUsers));
+        return { success: true, message: 'สมัครสมาชิกสำเร็จ!' };
+      }
+
+      if (funcName === 'getAvailableRooms') return mockRooms;
+
+      if (funcName === 'saveRoom') {
+        const [rData] = args;
+        const idx = mockRooms.findIndex(r => r.room_number === rData.room_number);
+        if (idx >= 0) {
+          mockRooms[idx] = rData;
+        } else {
+          mockRooms.push(rData);
+        }
+        localStorage.setItem(STORAGE_KEY_ROOMS, JSON.stringify(mockRooms));
+        return { success: true, message: 'บันทึกข้อมูลห้องเรียบร้อย' };
+      }
+
+      if (funcName === 'deleteRoom') {
+        const [roomNum] = args;
+        mockRooms = mockRooms.filter(r => r.room_number !== roomNum);
+        localStorage.setItem(STORAGE_KEY_ROOMS, JSON.stringify(mockRooms));
+        return { success: true, message: 'ลบห้องพักเรียบร้อย' };
+      }
+
+      if (funcName === 'saveBooking') {
+        const [bData] = args;
+        const exists = mockBookings.some(b => b.room_number === bData.room_number && b.date === bData.date && b.time === bData.time && b.status !== 'Canceled');
+        if (exists) return { success: false, message: 'ห้องพักถูกจองเต็มแล้วในช่วงเวลานี้' };
+
+        const newBk = { booking_id: 'BK-' + Math.floor(10000 + Math.random() * 90000), username: bData.username, fullname: bData.fullname, movie_title: bData.movie_title || 'Godzilla x Kong: The New Empire', room_number: bData.room_number, date: bData.date, time: bData.time, status: 'Confirmed', created_at: new Date().toLocaleString('th-TH') };
+        mockBookings.push(newBk);
+        localStorage.setItem(STORAGE_KEY_BOOKINGS, JSON.stringify(mockBookings));
+        return { success: true, message: 'จองห้องภาพยนตร์สำเร็จ!', booking_id: newBk.booking_id };
+      }
+
+      if (funcName === 'updateBookingDetails') {
+        const [bId, updated] = args;
+        const target = mockBookings.find(b => b.booking_id === bId);
+        if (target) {
+          Object.assign(target, updated);
+          localStorage.setItem(STORAGE_KEY_BOOKINGS, JSON.stringify(mockBookings));
+          return { success: true, message: 'แก้ไขรายละเอียดการจองสำเร็จ' };
+        }
+        return { success: false, message: 'ไม่พบรายการจอง' };
+      }
+
+      if (funcName === 'deleteBooking') {
+        const [bId] = args;
+        mockBookings = mockBookings.filter(b => b.booking_id !== bId);
+        localStorage.setItem(STORAGE_KEY_BOOKINGS, JSON.stringify(mockBookings));
+        return { success: true, message: 'ลบข้อมูลการจองเรียบร้อย' };
+      }
+
+      if (funcName === 'getUserBookings') {
+        const [username] = args;
+        return mockBookings.filter(b => b.username === username).reverse();
+      }
+
+      if (funcName === 'getBookings') return mockBookings.slice().reverse();
+
+      if (funcName === 'cancelBookingByUser') {
+        const [bId, uName] = args;
+        const target = mockBookings.find(b => b.booking_id === bId && b.username === uName);
+        if (target) {
+          target.status = 'Canceled';
+          localStorage.setItem(STORAGE_KEY_BOOKINGS, JSON.stringify(mockBookings));
+          return { success: true, message: 'ยกเลิกการจองเรียบร้อยแล้ว' };
+        }
+        return { success: false, message: 'ไม่พบข้อมูลการจอง' };
+      }
+
+      if (funcName === 'getUsers') return mockUsers;
+
+      if (funcName === 'updateUser') {
+        const [uId, uData] = args;
+        const target = mockUsers.find(u => u.id === uId);
+        if (target) {
+          target.fullname = uData.fullname;
+          target.telephone = uData.telephone;
+          target.role = uData.role;
+          target.status = uData.status;
+          if (uData.password) target.password = uData.password;
+          localStorage.setItem(STORAGE_KEY_USERS, JSON.stringify(mockUsers));
+          return { success: true, message: 'อัปเดตข้อมูลผู้ใช้เรียบร้อย' };
+        }
+        return { success: false, message: 'ไม่พบผู้ใช้งาน' };
+      }
+
+      if (funcName === 'deleteUser') {
+        const [uId] = args;
+        mockUsers = mockUsers.filter(u => u.id !== uId);
+        localStorage.setItem(STORAGE_KEY_USERS, JSON.stringify(mockUsers));
+        return { success: true, message: 'ลบสมาชิกเรียบร้อยแล้ว' };
+      }
+
+      return null;
+    }
+
+    function renderMovieOptions() {
+      const select = document.getElementById('bookMovieSelect');
+      const editSelect = document.getElementById('editBookingMovie');
+      select.innerHTML = '';
+      if (editSelect) editSelect.innerHTML = '';
+
+      moviesData.forEach(m => {
+        select.innerHTML += `<option value="${m.title}">${m.title}</option>`;
+        if (editSelect) editSelect.innerHTML += `<option value="${m.title}">${m.title}</option>`;
+      });
+    }
+
+    function updateMoviePreviewCard() {
+      const title = document.getElementById('bookMovieSelect').value;
+      const movie = moviesData.find(m => m.title === title) || moviesData[0];
+      const card = document.getElementById('moviePreviewCard');
+
+      card.innerHTML = `
+        <div class="d-flex align-items-center gap-3">
+          <img src="${movie.image}" alt="${movie.title}" class="movie-poster-box" onerror="this.src='https://placehold.co/140x180/1a102f/00f0ff?text=Cinema'">
+          <div>
+            <h5 class="fw-bold text-neon-cyan mb-2">${movie.title}</h5>
+            <p class="text-muted small mb-1"><i class="fa-solid fa-clapperboard me-2 text-neon-pink"></i>หมวดหมู่: <span class="text-white">${movie.genre}</span></p>
+            <p class="text-muted small mb-0"><i class="fa-solid fa-clock me-2 text-neon-purple"></i>ความยาว: <span class="text-white">${movie.duration}</span></p>
+          </div>
+        </div>
+      `;
+    }
+
+    async function loadRoomsData() {
+      try {
+        const res = await runGAS('getAvailableRooms');
+        if (res && Array.isArray(res) && res.length > 0) {
+          roomsData = res;
+        } else {
+          roomsData = defaultRooms;
+        }
+      } catch (e) {
+        roomsData = defaultRooms;
+      }
+      renderRoomOptions();
+      renderRoomGrid();
+    }
+
+    function renderRoomOptions() {
+      const select = document.getElementById('bookRoomSelect');
+      const editSelect = document.getElementById('editBookingRoom');
+      
+      select.innerHTML = '<option value="">-- เลือกห้องพัก --</option>';
+      if (editSelect) editSelect.innerHTML = '';
+      
+      const dataToRender = (roomsData && roomsData.length > 0) ? roomsData : defaultRooms;
+      dataToRender.forEach(r => {
+        const isAvail = r.available_status === 'Available';
+        select.innerHTML += `<option value="${r.room_number}" ${!isAvail ? 'disabled' : ''}>ห้อง ${r.room_number} - ${r.room_name} (${r.total_capacity} ท่าน) ${!isAvail ? '[ปิดปรับปรุง]' : ''}</option>`;
+        if (editSelect) editSelect.innerHTML += `<option value="${r.room_number}">ห้อง ${r.room_number} - ${r.room_name}</option>`;
+      });
+    }
+
+    function updateBookingRoomInfo() {
+      const roomNum = document.getElementById('bookRoomSelect').value;
+      const preview = document.getElementById('roomPreviewDetail');
+      const room = (roomsData || defaultRooms).find(r => r.room_number === roomNum);
+
+      if (room) {
+        preview.classList.remove('d-none');
+        preview.innerHTML = `
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="fw-bold text-neon-cyan mb-1">ห้อง ${room.room_number}: ${room.room_name}</h6>
+              <small class="text-muted"><i class="fa-solid fa-users text-neon-pink me-1"></i>ความจุสูงสุด: ${room.total_capacity} ท่าน | ระบบฉาย 4K Laser + Dolby Atmos</small>
+            </div>
+            <span class="badge ${room.available_status === 'Available' ? 'bg-success' : 'bg-danger'}">${room.available_status === 'Available' ? 'พร้อมใช้งาน' : 'ปิดปรับปรุง'}</span>
+          </div>
+        `;
+      } else {
+        preview.classList.add('d-none');
+      }
+    }
+
+    function renderRoomGrid() {
+      const container = document.getElementById('roomsGridContainer');
+      container.innerHTML = '';
+      const list = (roomsData && roomsData.length > 0) ? roomsData : defaultRooms;
+
+      list.forEach(r => {
+        const isAvail = r.available_status === 'Available';
+        container.innerHTML += `
+          <div class="col-md-6 col-lg-4">
+            <div class="card glass-card h-100 p-3">
+              <span class="badge ${isAvail ? 'bg-success' : 'bg-danger'} position-absolute top-0 end-0 m-3">${isAvail ? 'พร้อมใช้งาน' : 'ปิดปรับปรุง'}</span>
+              <div class="text-center py-3">
+                <i class="fa-solid fa-film display-3 text-neon-pink mb-2"></i>
+                <h5 class="fw-bold text-neon-cyan">ห้อง ${r.room_number}</h5>
+                <p class="fw-semibold mb-1">${r.room_name}</p>
+                <small class="text-muted d-block mb-3"><i class="fa-solid fa-user-group me-1"></i>ความจุ ${r.total_capacity} ที่นั่ง</small>
+                ${isAvail ? `
+                  <button class="btn btn-sm btn-neon-outline rounded-pill w-100" onclick="quickSelectRoom('${r.room_number}')">
+                    <i class="fa-solid fa-calendar-plus me-1"></i>เลือกจองห้องนี้
+                  </button>
+                ` : `
+                  <button class="btn btn-sm btn-secondary rounded-pill w-100" disabled>
+                    <i class="fa-solid fa-ban me-1"></i>ไม่พร้อมใช้งาน
+                  </button>
+                `}
+              </div>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function quickSelectRoom(roomNum) {
+      showUserTab('bookRoom');
+      document.getElementById('bookRoomSelect').value = roomNum;
+      updateBookingRoomInfo();
+    }
+
+    function switchAuthMode(mode) {
+      if (mode === 'register') {
+        document.getElementById('loginSection').classList.add('d-none');
+        document.getElementById('registerSection').classList.remove('d-none');
+      } else {
+        document.getElementById('registerSection').classList.add('d-none');
+        document.getElementById('loginSection').classList.remove('d-none');
+      }
+    }
+
+    async function submitLogin(e) {
+      e.preventDefault();
+      const uName = document.getElementById('loginUsername').value.trim();
+      const uPass = document.getElementById('loginPassword').value.trim();
+
+      Swal.fire({ title: 'กำลังตรวจสอบข้อมูล...', didOpen: () => Swal.showLoading() });
+
+      try {
+        const res = await runGAS('checkLogin', uName, uPass);
+        if (res.success) {
+          currentUser = res.user;
+          Swal.fire({ icon: 'success', title: 'เข้าสู่ระบบสำเร็จ!', text: `ยินดีต้อนรับ ${currentUser.fullname}`, timer: 1500, showConfirmButton: false });
+          setupUserSession();
+        } else {
+          Swal.fire({ icon: 'error', title: 'เข้าสู่ระบบไม่สำเร็จ', text: res.message });
+        }
+      } catch (err) {
+        Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: err.toString() });
+      }
+    }
+
+    async function submitRegister(e) {
+      e.preventDefault();
+      const userData = {
+        fullname: document.getElementById('regFullname').value.trim(),
+        username: document.getElementById('regUsername').value.trim(),
+        telephone: document.getElementById('regTelephone').value.trim(),
+        password: document.getElementById('regPassword').value.trim()
+      };
+
+      Swal.fire({ title: 'กำลังบันทึกข้อมูล...', didOpen: () => Swal.showLoading() });
+
+      try {
+        const res = await runGAS('registerUser', userData);
+        if (res.success) {
+          Swal.fire({ icon: 'success', title: 'สมัครสมาชิกสำเร็จ!', text: res.message, confirmButtonText: 'เข้าสู่ระบบทันที' })
+            .then(() => {
+              document.getElementById('registerForm').reset();
+              switchAuthMode('login');
+            });
+        } else {
+          Swal.fire({ icon: 'warning', title: 'ไม่สามารถสมัครได้', text: res.message });
+        }
+      } catch (err) {
+        Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: err.toString() });
+      }
+    }
+
+    function setupUserSession() {
+      document.getElementById('loginSection').classList.add('d-none');
+      document.getElementById('registerSection').classList.add('d-none');
+
+      document.getElementById('loggedUserDisplay').classList.remove('d-none');
+      document.getElementById('navUserFullname').innerText = currentUser.fullname;
+      document.getElementById('navUserRole').innerText = currentUser.role;
+
+      const authBtn = document.getElementById('authActionButton');
+      authBtn.innerHTML = '<i class="fa-solid fa-right-from-bracket me-2"></i>ออกจากระบบ';
+      authBtn.className = 'btn btn-outline-danger rounded-pill px-4';
+
+      if (currentUser.role === 'Admin') {
+        document.getElementById('userWorkspace').classList.add('d-none');
+        document.getElementById('adminWorkspace').classList.remove('d-none');
+        loadAdminDashboard();
+      } else {
+        document.getElementById('adminWorkspace').classList.add('d-none');
+        document.getElementById('userWorkspace').classList.remove('d-none');
+        showUserTab('bookRoom');
+      }
+    }
+
+    function handleAuthAction() {
+      if (currentUser) {
+        Swal.fire({
+          title: 'ยืนยันการออกจากระบบ?',
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonText: 'ใช่, ออกจากระบบ',
+          cancelButtonText: 'ยกเลิก'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            currentUser = null;
+            document.getElementById('loggedUserDisplay').classList.add('d-none');
+            document.getElementById('userWorkspace').classList.add('d-none');
+            document.getElementById('adminWorkspace').classList.add('d-none');
+            document.getElementById('loginSection').classList.remove('d-none');
+
+            const authBtn = document.getElementById('authActionButton');
+            authBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket me-2"></i>เข้าสู่ระบบ';
+            authBtn.className = 'btn btn-neon-pink rounded-pill px-4';
+          }
+        });
+      } else {
+        switchAuthMode('login');
+      }
+    }
+
+    async function submitBooking(e) {
+      e.preventDefault();
+      if (!currentUser) return;
+
+      const roomSelectVal = document.getElementById('bookRoomSelect').value;
+      if (!roomSelectVal) {
+        Swal.fire('กรุณาเลือกห้องภาพยนตร์', 'โปรดระบุห้องภาพยนตร์ที่ต้องการจอง', 'warning');
+        return;
+      }
+
+      const bookingData = {
+        username: currentUser.username,
+        fullname: currentUser.fullname,
+        movie_title: document.getElementById('bookMovieSelect').value,
+        room_number: roomSelectVal,
+        date: document.getElementById('bookDate').value,
+        time: document.getElementById('bookTime').value
+      };
+
+      Swal.fire({ title: 'กำลังตรวจสอบและทำการจอง...', didOpen: () => Swal.showLoading() });
+
+      try {
+        const res = await runGAS('saveBooking', bookingData);
+        if (res.success) {
+          Swal.fire({
+            icon: 'success',
+            title: 'จองห้องสำเร็จ!',
+            text: `รหัสการจองของคุณคือ: ${res.booking_id}`,
+            confirmButtonText: 'ดูประวัติการจอง'
+          }).then(() => {
+            document.getElementById('bookingForm').reset();
+            updateMoviePreviewCard();
+            updateBookingRoomInfo();
+            showUserTab('myBookings');
+          });
+        } else {
+          Swal.fire({ icon: 'error', title: 'ไม่สามารถจองห้องได้', text: res.message });
+        }
+      } catch (err) {
+        Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: err.toString() });
+      }
+    }
+
+    function showUserTab(tabName) {
+      document.getElementById('userTabBookRoom').classList.add('d-none');
+      document.getElementById('userTabCheckRooms').classList.add('d-none');
+      document.getElementById('userTabMyBookings').classList.add('d-none');
+
+      document.getElementById('tabBtnBook').className = 'nav-link btn-outline-light px-4 me-2';
+      document.getElementById('tabBtnCheck').className = 'nav-link btn-outline-light px-4 me-2';
+      document.getElementById('tabBtnHistory').className = 'nav-link btn-outline-light px-4';
+
+      if (tabName === 'bookRoom') {
+        document.getElementById('userTabBookRoom').classList.remove('d-none');
+        document.getElementById('tabBtnBook').className = 'nav-link active btn-neon-purple text-white px-4 me-2';
+      } else if (tabName === 'checkRooms') {
+        document.getElementById('userTabCheckRooms').classList.remove('d-none');
+        document.getElementById('tabBtnCheck').className = 'nav-link active btn-neon-purple text-white px-4 me-2';
+      } else if (tabName === 'myBookings') {
+        document.getElementById('userTabMyBookings').classList.remove('d-none');
+        document.getElementById('tabBtnHistory').className = 'nav-link active btn-neon-purple text-white px-4';
+        loadMyBookings();
+      }
+    }
+
+    async function loadMyBookings() {
+      if (!currentUser) return;
+      const tbody = document.getElementById('myBookingsTableBody');
+      tbody.innerHTML = '<tr><td colspan="8" class="text-center py-4"><i class="fa-solid fa-spinner fa-spin me-2"></i>กำลังโหลดประวัติ...</td></tr>';
+
+      try {
+        bookingsData = await runGAS('getUserBookings', currentUser.username);
+        tbody.innerHTML = '';
+
+        if (!bookingsData || bookingsData.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="8" class="text-center py-4 text-muted">ยังไม่มีประวัติการจองห้องดูหนัง</td></tr>';
+          return;
+        }
+
+        bookingsData.forEach(b => {
+          let statusBadge = `<span class="badge badge-confirmed">Confirmed</span>`;
+          if (b.status === 'Canceled') statusBadge = `<span class="badge badge-canceled">Canceled</span>`;
+          if (b.status === 'Checked-in') statusBadge = `<span class="badge badge-checkedin">Checked-in</span>`;
+
+          const canCancel = b.status !== 'Canceled' && b.status !== 'Checked-in';
+
+          tbody.innerHTML += `
+            <tr>
+              <td class="fw-bold text-neon-pink">${b.booking_id}</td>
+              <td class="text-neon-cyan fw-semibold">${b.movie_title || '-'}</td>
+              <td>ห้อง ${b.room_number}</td>
+              <td>${b.date}</td>
+              <td>${b.time}</td>
+              <td>${statusBadge}</td>
+              <td class="small text-muted">${b.created_at}</td>
+              <td class="text-center">
+                <div class="btn-group gap-1">
+                  ${canCancel ? `
+                    <button class="btn btn-sm btn-outline-warning rounded-pill px-2" onclick="openEditBookingModal('${b.booking_id}')" title="แก้ไขการจอง">
+                      <i class="fa-solid fa-pen"></i> แก้ไข
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger rounded-pill px-2" onclick="confirmCancelBooking('${b.booking_id}')" title="ยกเลิกการจอง">
+                      <i class="fa-solid fa-xmark"></i> ยกเลิก
+                    </button>
+                  ` : `
+                    <button class="btn btn-sm btn-outline-secondary rounded-pill px-2" onclick="confirmDeleteBooking('${b.booking_id}')" title="ลบประวัติ">
+                      <i class="fa-solid fa-trash"></i> ลบ
+                    </button>
+                  `}
+                </div>
+              </td>
+            </tr>
+          `;
+        });
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center py-4 text-danger">ไม่สามารถโหลดข้อมูลได้</td></tr>';
+      }
+    }
+
+    async function confirmCancelBooking(bookingId) {
+      Swal.fire({
+        title: 'ยืนยันการยกเลิกการจอง?',
+        text: `คุณต้องการยกเลิกใบจองรหัส ${bookingId} ใช่หรือไม่?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonText: 'ย้อนกลับ',
+        confirmButtonText: 'กดยืนยันยกเลิก'
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          Swal.fire({ title: 'กำลังดำเนินการ...', didOpen: () => Swal.showLoading() });
+          try {
+            const res = await runGAS('cancelBookingByUser', bookingId, currentUser.username);
+            if (res.success) {
+              Swal.fire({ icon: 'success', title: 'ยกเลิกสำเร็จ!', text: res.message });
+              loadMyBookings();
+            } else {
+              Swal.fire({ icon: 'error', title: 'ยกเลิกไม่สำเร็จ', text: res.message });
+            }
+          } catch (err) {
+            Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: err.toString() });
+          }
+        }
+      });
+    }
+
+    async function confirmDeleteBooking(bookingId) {
+      Swal.fire({
+        title: 'ยืนยันการลบประวัติ?',
+        text: `คุณต้องการลบข้อมูลการจองรหัส ${bookingId} ถาวรหรือไม่?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'ใช่, ลบถาวร',
+        cancelButtonText: 'ยกเลิก'
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          Swal.fire({ title: 'กำลังลบข้อมูล...', didOpen: () => Swal.showLoading() });
+          try {
+            const res = await runGAS('deleteBooking', bookingId);
+            if (res.success) {
+              Swal.fire({ icon: 'success', title: 'ลบเรียบร้อยแล้ว', timer: 1200, showConfirmButton: false });
+              if (currentUser.role === 'Admin') loadAdminDashboard();
+              else loadMyBookings();
+            } else {
+              Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: res.message });
+            }
+          } catch (err) {
+            Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: err.toString() });
+          }
+        }
+      });
+    }
+
+    function showAdminTab(tabName) {
+      document.getElementById('adminTabDashboard').classList.add('d-none');
+      document.getElementById('adminTabRoomManagement').classList.add('d-none');
+      document.getElementById('adminTabUserManagement').classList.add('d-none');
+
+      const links = document.querySelectorAll('#adminSidebarMenu .nav-link');
+      links.forEach(l => l.classList.remove('active'));
+
+      if (tabName === 'dashboard') {
+        document.getElementById('adminTabDashboard').classList.remove('d-none');
+        links[0].classList.add('active');
+        loadAdminDashboard();
+      } else if (tabName === 'roomManagement') {
+        document.getElementById('adminTabRoomManagement').classList.remove('d-none');
+        links[1].classList.add('active');
+        loadAdminRoomManagement();
+      } else if (tabName === 'userManagement') {
+        document.getElementById('adminTabUserManagement').classList.remove('d-none');
+        links[2].classList.add('active');
+        loadAdminUserManagement();
+      }
+    }
+
+    async function loadAdminDashboard() {
+      const tbody = document.getElementById('adminBookingsTableBody');
+      tbody.innerHTML = '<tr><td colspan="9" class="text-center py-4"><i class="fa-solid fa-spinner fa-spin me-2"></i>กำลังดึงข้อมูลการจองทั้งหมด...</td></tr>';
+
+      try {
+        const allBookings = await runGAS('getBookings') || [];
+        const rooms = await runGAS('getAvailableRooms') || [];
+        
+        document.getElementById('statTotalBookings').innerText = allBookings.length;
+        document.getElementById('statConfirmedBookings').innerText = allBookings.filter(b => b.status === 'Confirmed' || b.status === 'Checked-in').length;
+        document.getElementById('statCanceledBookings').innerText = allBookings.filter(b => b.status === 'Canceled').length;
+        document.getElementById('statTotalRooms').innerText = rooms.length;
+
+        tbody.innerHTML = '';
+        if (allBookings.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="9" class="text-center py-4 text-muted">ยังไม่มีรายการจองในระบบ</td></tr>';
+          return;
+        }
+
+        allBookings.forEach(b => {
+          tbody.innerHTML += `
+            <tr>
+              <td class="fw-bold text-neon-pink">${b.booking_id}</td>
+              <td>${b.username}</td>
+              <td>${b.fullname}</td>
+              <td class="text-neon-cyan">${b.movie_title || '-'}</td>
+              <td>ห้อง ${b.room_number}</td>
+              <td>${b.date}</td>
+              <td>${b.time}</td>
+              <td>
+                <span class="badge ${b.status === 'Confirmed' ? 'badge-confirmed' : b.status === 'Checked-in' ? 'badge-checkedin' : 'badge-canceled'}">${b.status}</span>
+              </td>
+              <td class="text-center">
+                <div class="btn-group gap-1">
+                  <button class="btn btn-sm btn-outline-warning rounded-circle" onclick="openEditBookingModal('${b.booking_id}')" title="แก้ไขข้อมูล">
+                    <i class="fa-solid fa-pen"></i>
+                  </button>
+                  <button class="btn btn-sm btn-outline-danger rounded-circle" onclick="confirmDeleteBooking('${b.booking_id}')" title="ลบรายการ">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `;
+        });
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center py-4 text-danger">ไม่สามารถโหลดข้อมูลได้</td></tr>';
+      }
+    }
+
+    async function openEditBookingModal(bookingId) {
+      let b = (bookingsData || []).find(item => item.booking_id === bookingId);
+      if (!b) {
+        const allBk = await runGAS('getBookings');
+        b = allBk.find(item => item.booking_id === bookingId);
+      }
+      if (!b) return;
+
+      document.getElementById('editBookingId').value = b.booking_id;
+      document.getElementById('editBookingMovie').value = b.movie_title || moviesData[0].title;
+      document.getElementById('editBookingRoom').value = b.room_number;
+      document.getElementById('editBookingDate').value = b.date;
+      document.getElementById('editBookingTime').value = b.time;
+      document.getElementById('editBookingStatus').value = b.status;
+
+      const modal = new bootstrap.Modal(document.getElementById('editBookingModal'));
+      modal.show();
+    }
+
+    async function saveEditBooking(e) {
+      e.preventDefault();
+      const bId = document.getElementById('editBookingId').value;
+      const updated = {
+        movie_title: document.getElementById('editBookingMovie').value,
+        room_number: document.getElementById('editBookingRoom').value,
+        date: document.getElementById('editBookingDate').value,
+        time: document.getElementById('editBookingTime').value,
+        status: document.getElementById('editBookingStatus').value
+      };
+
+      Swal.fire({ title: 'กำลังบันทึก...', didOpen: () => Swal.showLoading() });
+
+      try {
+        const res = await runGAS('updateBookingDetails', bId, updated);
+        bootstrap.Modal.getInstance(document.getElementById('editBookingModal')).hide();
+        if (res.success) {
+          Swal.fire({ icon: 'success', title: 'แก้ไขสำเร็จ!', timer: 1200, showConfirmButton: false });
+          if (currentUser.role === 'Admin') loadAdminDashboard();
+          else loadMyBookings();
+        } else {
+          Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: res.message });
+        }
+      } catch (err) {
+        Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: err.toString() });
+      }
+    }
+
+    async function loadAdminRoomManagement() {
+      const tbody = document.getElementById('adminRoomsTableBody');
+      tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4"><i class="fa-solid fa-spinner fa-spin me-2"></i>กำลังดึงข้อมูลห้องภาพยนตร์...</td></tr>';
+
+      try {
+        roomsData = await runGAS('getAvailableRooms');
+        tbody.innerHTML = '';
+
+        roomsData.forEach(r => {
+          const isAvail = r.available_status === 'Available';
+          tbody.innerHTML += `
+            <tr>
+              <td class="fw-bold text-neon-pink">ห้อง ${r.room_number}</td>
+              <td class="fw-semibold">${r.room_name}</td>
+              <td>${r.total_capacity} ท่าน</td>
+              <td><span class="badge ${isAvail ? 'bg-success' : 'bg-danger'}">${isAvail ? 'Available' : 'Maintenance'}</span></td>
+              <td class="text-center">
+                <div class="btn-group gap-1">
+                  <button class="btn btn-sm btn-outline-warning rounded-circle" onclick="openEditRoomModal('${r.room_number}')" title="แก้ไขห้อง">
+                    <i class="fa-solid fa-pen"></i>
+                  </button>
+                  <button class="btn btn-sm btn-outline-danger rounded-circle" onclick="confirmDeleteRoom('${r.room_number}')" title="ลบห้อง">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `;
+        });
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-danger">ไม่สามารถโหลดข้อมูลห้องได้</td></tr>';
+      }
+    }
+
+    function openAddRoomModal() {
+      document.getElementById('roomIsEdit').value = "false";
+      document.getElementById('roomModalTitle').innerHTML = '<i class="fa-solid fa-plus me-2"></i>เพิ่มห้องภาพยนตร์ใหม่';
+      document.getElementById('roomModalNumber').value = '';
+      document.getElementById('roomModalNumber').removeAttribute('readonly');
+      document.getElementById('roomModalName').value = '';
+      document.getElementById('roomModalCapacity').value = '4';
+      document.getElementById('roomModalStatus').value = 'Available';
+
+      const modal = new bootstrap.Modal(document.getElementById('roomModal'));
+      modal.show();
+    }
+
+    function openEditRoomModal(roomNum) {
+      const room = roomsData.find(r => r.room_number === roomNum);
+      if (!room) return;
+
+      document.getElementById('roomIsEdit').value = "true";
+      document.getElementById('roomModalTitle').innerHTML = '<i class="fa-solid fa-pen-to-square me-2"></i>แก้ไขข้อมูลห้องภาพยนตร์';
+      document.getElementById('roomModalNumber').value = room.room_number;
+      document.getElementById('roomModalNumber').setAttribute('readonly', 'readonly');
+      document.getElementById('roomModalName').value = room.room_name;
+      document.getElementById('roomModalCapacity').value = room.total_capacity;
+      document.getElementById('roomModalStatus').value = room.available_status;
+
+      const modal = new bootstrap.Modal(document.getElementById('roomModal'));
+      modal.show();
+    }
+
+    async function saveRoomForm(e) {
+      e.preventDefault();
+      const roomData = {
+        room_number: document.getElementById('roomModalNumber').value.trim(),
+        room_name: document.getElementById('roomModalName').value.trim(),
+        total_capacity: Number(document.getElementById('roomModalCapacity').value),
+        available_status: document.getElementById('roomModalStatus').value
+      };
+
+      Swal.fire({ title: 'กำลังบันทึกห้องพัก...', didOpen: () => Swal.showLoading() });
+
+      try {
+        const res = await runGAS('saveRoom', roomData);
+        bootstrap.Modal.getInstance(document.getElementById('roomModal')).hide();
+        if (res.success) {
+          Swal.fire({ icon: 'success', title: 'บันทึกสำเร็จ!', timer: 1200, showConfirmButton: false });
+          loadRoomsData();
+          loadAdminRoomManagement();
+        } else {
+          Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: res.message });
+        }
+      } catch (err) {
+        Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: err.toString() });
+      }
+    }
+
+    async function confirmDeleteRoom(roomNum) {
+      Swal.fire({
+        title: 'ยืนยันการลบห้องพัก?',
+        text: `คุณต้องการลบห้อง ${roomNum} ใช่หรือไม่?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'ใช่, ลบห้องนี้',
+        cancelButtonText: 'ยกเลิก'
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          Swal.fire({ title: 'กำลังลบห้องพัก...', didOpen: () => Swal.showLoading() });
+          try {
+            const res = await runGAS('deleteRoom', roomNum);
+            if (res.success) {
+              Swal.fire({ icon: 'success', title: 'ลบเรียบร้อยแล้ว', timer: 1200, showConfirmButton: false });
+              loadRoomsData();
+              loadAdminRoomManagement();
+            } else {
+              Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: res.message });
+            }
+          } catch (err) {
+            Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: err.toString() });
+          }
+        }
+      });
+    }
+
+    async function loadAdminUserManagement() {
+      const tbody = document.getElementById('adminUsersTableBody');
+      tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4"><i class="fa-solid fa-spinner fa-spin me-2"></i>กำลังดึงข้อมูลสมาชิก...</td></tr>';
+
+      try {
+        usersData = await runGAS('getUsers');
+        tbody.innerHTML = '';
+
+        usersData.forEach(u => {
+          const isActive = u.status === 'Active';
+          tbody.innerHTML += `
+            <tr>
+              <td class="fw-bold text-neon-pink">${u.id}</td>
+              <td>${u.fullname}</td>
+              <td class="text-neon-cyan">${u.username}</td>
+              <td>${u.telephone}</td>
+              <td><span class="badge ${u.role === 'Admin' ? 'bg-danger' : 'bg-secondary'}">${u.role}</span></td>
+              <td><span class="badge ${isActive ? 'bg-success' : 'bg-danger'}">${u.status}</span></td>
+              <td class="text-center">
+                <div class="btn-group gap-1">
+                  <button class="btn btn-sm btn-outline-warning rounded-circle" onclick="openEditUserModal('${u.id}')" title="แก้ไขข้อมูลสมาชิก">
+                    <i class="fa-solid fa-pen"></i>
+                  </button>
+                  <button class="btn btn-sm btn-outline-danger rounded-circle" onclick="confirmDeleteUser('${u.id}')" title="ลบสมาชิก">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `;
+        });
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-danger">ไม่สามารถโหลดข้อมูลผู้ใช้ได้</td></tr>';
+      }
+    }
+
+    function openEditUserModal(userId) {
+      const u = usersData.find(user => user.id === userId);
+      if (!u) return;
+
+      document.getElementById('editUserId').value = u.id;
+      document.getElementById('editUserFullname').value = u.fullname;
+      document.getElementById('editUserUsername').value = u.username;
+      document.getElementById('editUserTelephone').value = u.telephone;
+      document.getElementById('editUserPassword').value = '';
+      document.getElementById('editUserRole').value = u.role;
+      document.getElementById('editUserStatus').value = u.status;
+
+      const modal = new bootstrap.Modal(document.getElementById('editUserModal'));
+      modal.show();
+    }
+
+    async function saveUserForm(e) {
+      e.preventDefault();
+      const uId = document.getElementById('editUserId').value;
+      const uData = {
+        fullname: document.getElementById('editUserFullname').value.trim(),
+        telephone: document.getElementById('editUserTelephone').value.trim(),
+        password: document.getElementById('editUserPassword').value.trim(),
+        role: document.getElementById('editUserRole').value,
+        status: document.getElementById('editUserStatus').value
+      };
+
+      Swal.fire({ title: 'กำลังบันทึกข้อมูลสมาชิก...', didOpen: () => Swal.showLoading() });
+
+      try {
+        const res = await runGAS('updateUser', uId, uData);
+        bootstrap.Modal.getInstance(document.getElementById('editUserModal')).hide();
+        if (res.success) {
+          Swal.fire({ icon: 'success', title: 'อัปเดตสมาชิกสำเร็จ!', timer: 1200, showConfirmButton: false });
+          loadAdminUserManagement();
+        } else {
+          Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: res.message });
+        }
+      } catch (err) {
+        Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: err.toString() });
+      }
+    }
+
+    async function confirmDeleteUser(userId) {
+      Swal.fire({
+        title: 'ยืนยันการลบสมาชิก?',
+        text: `คุณต้องการลบผู้ใช้รหัส ${userId} ออกจากระบบถาวรหรือไม่?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'ใช่, ลบผู้ใช้',
+        cancelButtonText: 'ยกเลิก'
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          Swal.fire({ title: 'กำลังลบผู้ใช้...', didOpen: () => Swal.showLoading() });
+          try {
+            const res = await runGAS('deleteUser', userId);
+            if (res.success) {
+              Swal.fire({ icon: 'success', title: 'ลบสมาชิกเรียบร้อยแล้ว', timer: 1200, showConfirmButton: false });
+              loadAdminUserManagement();
+            } else {
+              Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: res.message });
+            }
+          } catch (err) {
+            Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: err.toString() });
+          }
+        }
+      });
+    }
+
+    function exportUserBookingsExcel() {
+      if (!bookingsData || bookingsData.length === 0) {
+        Swal.fire('ไม่มีข้อมูล', 'ไม่มีข้อมูลประวัติการจองสำหรับส่งออก', 'info');
+        return;
+      }
+      const dataToExport = bookingsData.map(b => ({
+        'รหัสการจอง': b.booking_id,
+        'ภาพยนตร์': b.movie_title || '-',
+        'หมายเลขห้อง': b.room_number,
+        'วันที่ใช้งาน': b.date,
+        'รอบเวลา': b.time,
+        'สถานะ': b.status,
+        'ทำรายการเมื่อ': b.created_at
+      }));
+
+      const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "MyBookings");
+      XLSX.writeFile(workbook, `My_Cinema_Bookings_${currentUser.username}.xlsx`);
+      Swal.fire({ icon: 'success', title: 'ดาวน์โหลดไฟล์ Excel เรียบร้อย!' });
+    }
+
+    function exportUserBookingsPDF() {
+      const element = document.getElementById('myBookingsPrintArea');
+      const opt = {
+        margin:       0.5,
+        filename:     `Cinema_Ticket_${currentUser.username}.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' }
+      };
+
+      Swal.fire({ title: 'กำลังสร้างไฟล์ PDF...', didOpen: () => Swal.showLoading() });
+      html2pdf().set(opt).from(element).save().then(() => {
+        Swal.fire({ icon: 'success', title: 'ดาวน์โหลดไฟล์ PDF เรียบร้อย!' });
+      });
+    }
+
+    async function exportAdminBookingsExcel() {
+      const allBookings = await runGAS('getBookings');
+      if (!allBookings || allBookings.length === 0) {
+        Swal.fire('ไม่มีข้อมูล', 'ไม่มีข้อมูลการจองในระบบ', 'info');
+        return;
+      }
+      const worksheet = XLSX.utils.json_to_sheet(allBookings);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "AllBookings");
+      XLSX.writeFile(workbook, `Admin_All_Bookings_Report.xlsx`);
+      Swal.fire({ icon: 'success', title: 'ดาวน์โหลดรายงาน Excel สำเร็จ!' });
+    }
+
+    function exportAdminBookingsPDF() {
+      const element = document.getElementById('adminBookingsPrintArea');
+      const opt = {
+        margin:       0.5,
+        filename:     `Admin_Cinema_Bookings_Report.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' }
+      };
+
+      Swal.fire({ title: 'กำลังสร้างไฟล์ PDF...', didOpen: () => Swal.showLoading() });
+      html2pdf().set(opt).from(element).save().then(() => {
+        Swal.fire({ icon: 'success', title: 'ดาวน์โหลดไฟล์ PDF เรียบร้อย!' });
+      });
+    }
+  </script>
+</body>
+</html>
